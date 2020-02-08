@@ -1,0 +1,25 @@
+## Extract metadata :\\
+## Fix forbidden errors
+import ssl
+from bs4 import BeautifulSoup
+import urllib.request
+import requests
+
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
+f=urllib.request.urlopen("https://digital.library.unt.edu/ark:/67531/metadc680861/?q=information%20science")
+webpage = f.read()
+soup = BeautifulSoup(webpage)
+#print(soup)
+all_links = soup.find_all("a")
+#for link in all_links:
+  #print(link.get("href"))
+list_link = []
+for link in soup.select ("a[href$='.pdf']"):
+  list_link.append(link.get("href"))
+for l in list_link:
+  response = requests.get(l, allow_redirects=True)
+with open('E:\webscrapping\hello.pdf', 'wb') as f:
+    f.write(response.content)
