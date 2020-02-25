@@ -1,0 +1,42 @@
+from bs4 import BeautifulSoup
+import requests
+
+session = requests.Session()
+
+link = 'https://www.imdb.com/title/tt7286456/reviews'
+UA = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Language': 'en',
+    'Accept-Encoding': 'gzip, deflate',
+    'Connection': 'close',
+    'Upgrade-Insecure-Requests': '1'
+}
+
+getlink = session.get(link, headers=UA)
+resplink = BeautifulSoup(getlink.content, 'html.parser')
+key = resplink.find('div', {'class':'load-more-data'})
+datakey = key.attrs['data-key']
+
+UAloadmore = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:73.0) Gecko/20100101 Firefox/73.0',
+    'Accept': '*/*',
+    'Accept-Language': 'en',
+    'Accept-Encoding': 'gzip, deflate',
+    'X-Requested-With': 'XMLHttpRequest',
+    'Connection': 'close',
+    'Referer': 'https://www.imdb.com/title/tt7286456/reviews'
+}
+
+a = True
+while a:
+    if key is None:
+        print('Loi')
+        a = False
+    else:
+        linkloadmore = 'https://www.imdb.com/title/tt7286456/reviews/_ajax?ref_=undefined&paginationKey='+datakey
+        getloadmore = session.get(linkloadmore, headers=UAloadmore)
+        resploadmore = BeautifulSoup(getloadmore.content, 'html.parser')
+        key = resploadmore.find('div', {'class':'load-more-data'})
+        datakey = key.attrs['data-key']
+        print('https://www.imdb.com/title/tt7286456/reviews/_ajax?ref_=undefined&paginationKey='+datakey)
